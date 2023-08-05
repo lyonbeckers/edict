@@ -19,6 +19,9 @@
 
 #![allow(missing_docs)]
 
+#[cfg(not(feature = "std"))]
+use alloc::{boxed::Box, vec::Vec};
+
 use alloc::{collections::VecDeque, sync::Arc};
 use core::{
     cell::UnsafeCell,
@@ -26,6 +29,7 @@ use core::{
     ptr::NonNull,
     sync::atomic::{AtomicUsize, Ordering},
 };
+#[cfg(feature = "std")]
 use std::thread::Thread;
 
 use hashbrown::HashSet;
@@ -105,9 +109,34 @@ struct ScheduledSystem {
     is_local: bool,
 }
 
+#[cfg(feature = "std")]
 struct QueueInner<T> {
     items: Mutex<VecDeque<T>>,
     thread: Thread,
+}
+
+#[cfg(feature = "std")]
+impl<T> QueueInner<T> {
+    pub fn new() -> Self {
+        Self {
+            items: Mutex::new(VecDeque::new()),
+            thread: std::thread::current(),
+        }
+    }
+}
+
+#[cfg(not(feature = "std"))]
+struct QueueInner<T> {
+    items: Mutex<VecDeque<T>>,
+}
+
+#[cfg(not(feature = "std"))]
+impl<T> QueueInner<T> {
+    pub fn new() -> Self {
+        Self {
+            items: Mutex::new(VecDeque::new()),
+        }
+    }
 }
 
 struct Queue<T> {
@@ -123,6 +152,7 @@ impl<T> Clone for Queue<T> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<T> Drop for Queue<T> {
     #[inline]
     fn drop(&mut self) {
@@ -136,16 +166,14 @@ impl<T> Queue<T> {
     #[inline]
     fn new() -> Self {
         Queue {
-            inner: Arc::new(QueueInner {
-                items: Mutex::new(VecDeque::new()),
-                thread: std::thread::current(),
-            }),
+            inner: Arc::new(QueueInner::new()),
         }
     }
 
     #[inline]
     fn enqueue(&self, item: T) {
         self.inner.items.lock().push_back(item);
+        #[cfg(feature = "std")]
         self.inner.thread.unpark();
     }
 
@@ -163,6 +191,7 @@ impl<T> Queue<T> {
             if Arc::strong_count(&self.inner) == 1 {
                 return Err(());
             }
+            #[cfg(feature = "std")]
             std::thread::park();
         }
     }

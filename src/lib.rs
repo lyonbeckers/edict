@@ -370,7 +370,6 @@ pub mod relation;
 pub mod system;
 pub mod world;
 
-#[cfg(feature = "std")]
 pub mod scheduler;
 #[cfg(feature = "std")]
 pub mod task;

@@ -115,7 +115,7 @@ where
 }
 
 use alloc::{sync::Arc, task::Wake};
-use parking_lot::Mutex;
+use spin::Mutex;
 use tls::WorldTLS;
 
 /// State of [`task_system`].

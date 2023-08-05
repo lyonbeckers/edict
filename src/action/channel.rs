@@ -5,7 +5,7 @@ use core::{
 };
 
 use alloc::{collections::VecDeque, sync::Arc};
-use parking_lot::Mutex;
+use spin::Mutex;
 
 use crate::{
     bundle::{Bundle, ComponentBundle, DynamicBundle, DynamicComponentBundle},

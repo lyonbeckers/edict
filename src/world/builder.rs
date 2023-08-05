@@ -7,6 +7,10 @@ use crate::{
     entity::{EntitySet, IdRangeAllocator},
     res::Res,
 };
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+#[cfg(not(feature = "std"))]
+use alloc::boxed::Box;
 
 use super::{ArchetypeSet, Edges, EpochCounter, World};
 

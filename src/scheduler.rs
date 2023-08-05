@@ -29,7 +29,7 @@ use core::{
 use std::thread::Thread;
 
 use hashbrown::HashSet;
-use parking_lot::Mutex;
+use spin::Mutex;
 
 use crate::{
     action::ActionBuffer,

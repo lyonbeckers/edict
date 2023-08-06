@@ -11,7 +11,7 @@ use core::{
     iter::FusedIterator,
     marker::PhantomData,
     ops::{Deref, DerefMut},
-    sync::atomic::{AtomicU64, Ordering},
+    sync::atomic::{AtomicU32, Ordering},
 };
 
 use atomicell::{Ref, RefMut};
@@ -51,12 +51,12 @@ const MAX_SPAWN_RESERVE: usize = 1024;
 /// `World` keeps same id until archetype set changes.
 ///
 /// This value starts with 1 because 0 is reserved for empty set.
-static NEXT_ARCHETYPE_SET_ID: AtomicU64 = AtomicU64::new(1);
+static NEXT_ARCHETYPE_SET_ID: AtomicU32 = AtomicU32::new(1);
 
 struct ArchetypeSet {
     /// Unique archetype set id.
     /// Changes each time new archetype is added.
-    id: u64,
+    id: u32,
 
     archetypes: Vec<Archetype>,
 }
@@ -84,7 +84,7 @@ impl ArchetypeSet {
         }
     }
 
-    fn id(&self) -> u64 {
+    fn id(&self) -> u32 {
         self.id
     }
 
@@ -244,7 +244,7 @@ impl World {
     /// This ID changes each time new archetype is added or removed.
     /// IDs of different worlds are never equal within the same process.
     #[inline]
-    pub fn archetype_set_id(&self) -> u64 {
+    pub fn archetype_set_id(&self) -> u32 {
         self.archetypes.id()
     }
 

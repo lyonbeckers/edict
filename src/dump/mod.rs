@@ -33,7 +33,7 @@ pub mod nanoserde;
 pub mod serde;
 
 /// Opaque integer triple that needs to be serialized and deserialized.
-pub struct EntityDump(pub [u64; 3]);
+pub struct EntityDump(pub [u32; 3]);
 
 /// Serializer implementation.
 pub trait Dumper<T: DumpSet + ?Sized> {

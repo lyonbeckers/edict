@@ -1,4 +1,4 @@
-use core::{cmp::Ordering, fmt, num::NonZeroU64};
+use core::{cmp::Ordering, fmt, num::NonZeroU32};
 
 /// Unique identifier of an entity.
 /// The identifier is unique within the world and
@@ -7,7 +7,7 @@ use core::{cmp::Ordering, fmt, num::NonZeroU64};
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct EntityId {
-    value: NonZeroU64,
+    value: NonZeroU32,
 }
 
 impl PartialOrd for EntityId {
@@ -26,7 +26,7 @@ impl Ord for EntityId {
 
 impl EntityId {
     #[inline]
-    pub(crate) fn new(value: NonZeroU64) -> Self {
+    pub(crate) fn new(value: NonZeroU32) -> Self {
         EntityId { value }
     }
 
@@ -46,21 +46,21 @@ impl EntityId {
     pub fn dangling() -> Self {
         EntityId {
             // Safety: 1 is not 0.
-            value: NonZeroU64::new(1).unwrap(),
+            value: NonZeroU32::new(1).unwrap(),
         }
     }
 
     /// Gets 64-bit integer that can be converted back to equal `EntityId`.
     #[inline]
-    pub fn bits(&self) -> u64 {
+    pub fn bits(&self) -> u32 {
         self.value.get()
     }
 
     /// Converts 64-bit integer to `EntityId`.
     /// Returns `None` for integer less than or equal to `u32::MAX`.
     #[inline]
-    pub fn from_bits(bits: u64) -> Option<Self> {
-        let value = NonZeroU64::new(bits)?;
+    pub fn from_bits(bits: u32) -> Option<Self> {
+        let value = NonZeroU32::new(bits)?;
         Some(EntityId { value })
     }
 
@@ -77,7 +77,7 @@ impl EntityId {
     // }
 
     #[inline]
-    fn order(&self) -> u64 {
+    fn order(&self) -> u32 {
         self.value.get()
     }
 }

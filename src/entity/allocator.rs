@@ -2,7 +2,7 @@
 extern crate alloc;
 #[cfg(not(feature = "std"))]
 use alloc::boxed::Box;
-use core::num::NonZeroU64;
+use core::num::NonZeroU32;
 
 /// Range of raw entity IDs.
 /// `start` is inclusive, `end` is exclusive.
@@ -11,14 +11,14 @@ use core::num::NonZeroU64;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct IdRange {
     /// Start of the range. Inclusive.
-    pub start: NonZeroU64,
+    pub start: NonZeroU32,
 
     /// End of the range. Exclusive.
-    pub end: NonZeroU64,
+    pub end: NonZeroU32,
 }
 
-const START: NonZeroU64 = unsafe { NonZeroU64::new_unchecked(1) };
-const END: NonZeroU64 = unsafe { NonZeroU64::new_unchecked(u64::MAX) };
+const START: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(1) };
+const END: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(u32::MAX) };
 
 impl IdRange {
     /// Returns proper range with `start` less than or equal to `end`.
@@ -30,7 +30,7 @@ impl IdRange {
     }
 
     /// Returns number of IDs in the range.
-    pub fn count(&self) -> u64 {
+    pub fn count(&self) -> u32 {
         debug_assert!(self.start <= self.end);
         self.end.get() - self.start.get()
     }
@@ -42,39 +42,39 @@ impl IdRange {
     }
 
     /// Returns ID at the given index.
-    pub fn get(&self, idx: u64) -> Option<NonZeroU64> {
+    pub fn get(&self, idx: u32) -> Option<NonZeroU32> {
         if idx >= self.count() {
             return None;
         }
 
         // Safety: `self.start + idx` can't overflow
         // since `idx` is less than `self.count`.
-        Some(unsafe { NonZeroU64::new_unchecked(self.start.get() + idx) })
+        Some(unsafe { NonZeroU32::new_unchecked(self.start.get() + idx) })
     }
 
     /// Advances range by at most `count` IDs.
     /// Calls provided closure with each ID.
     /// Returns number of IDs advanced.
-    pub fn advance(&mut self, count: u64, mut f: impl FnMut(NonZeroU64)) -> u64 {
+    pub fn advance(&mut self, count: u32, mut f: impl FnMut(NonZeroU32)) -> u32 {
         let count = count.min(self.count());
 
         let mut id = self.start;
 
         // Safety: `self.start + count` never overflows.
-        self.start = unsafe { NonZeroU64::new_unchecked(self.start.get() + count) };
+        self.start = unsafe { NonZeroU32::new_unchecked(self.start.get() + count) };
 
         while id < self.start {
             f(id);
             // Safety: `id + 1` never overflows
-            // since it's less than another `NonZeroU64`.
-            unsafe { id = NonZeroU64::new_unchecked(id.get() + 1) };
+            // since it's less than another `NonZeroU32`.
+            unsafe { id = NonZeroU32::new_unchecked(id.get() + 1) };
         }
 
         count
     }
 
     /// Take first ID from the range.
-    pub fn take(&mut self) -> Option<NonZeroU64> {
+    pub fn take(&mut self) -> Option<NonZeroU32> {
         if self.is_empty() {
             return None;
         }
@@ -83,7 +83,7 @@ impl IdRange {
 
         // Safety: `id + 1` can't overflow
         // since there's larger value.
-        self.start = unsafe { NonZeroU64::new_unchecked(id.get() + 1) };
+        self.start = unsafe { NonZeroU32::new_unchecked(id.get() + 1) };
 
         Some(id)
     }
@@ -96,7 +96,7 @@ pub(super) struct IdAllocator {
 }
 
 impl IdAllocator {
-    /// Id allocator that allocates IDs from [1..=u64::MAX].
+    /// Id allocator that allocates IDs from [1..=u32::MAX].
     /// without external ID ranges.
     pub fn new() -> Self {
         IdAllocator {
@@ -128,7 +128,7 @@ impl IdAllocator {
     /// Returns next ID from the range.
     /// If the range is exhausted, allocates new range from the allocator.
     /// If allocator is exhausted, returns `None`.
-    pub fn next(&mut self) -> Option<NonZeroU64> {
+    pub fn next(&mut self) -> Option<NonZeroU32> {
         if self.current.is_empty() {
             self.current = self.next;
             self.next = self.range_alloc.allocate_range().proper();
@@ -143,7 +143,7 @@ impl IdAllocator {
     ///
     /// Caller SHOULD use `idx` values in order from 0 to not
     /// waste IDs.
-    pub fn reserve(&self, idx: u64) -> Option<NonZeroU64> {
+    pub fn reserve(&self, idx: u32) -> Option<NonZeroU32> {
         if idx < self.current.count() {
             return Some(unsafe { self.current.get(idx).unwrap_unchecked() });
         }
@@ -154,7 +154,7 @@ impl IdAllocator {
 
     /// Returns reserve index of the ID.
     /// Returns `None` if ID is not reserved.
-    pub fn reserved(&self, id: u64) -> Option<u64> {
+    pub fn reserved(&self, id: u32) -> Option<u32> {
         if id >= self.current.start.get() && id < self.current.end.get() {
             return Some(id - self.current.start.get());
         }
@@ -167,7 +167,7 @@ impl IdAllocator {
     /// Calls provided closure with reserved IDs.
     /// `count` must be larger than all `idx` values passed to `reserve` that
     /// returned `Some`
-    pub unsafe fn flush_reserved(&mut self, count: u64, mut f: impl FnMut(NonZeroU64)) {
+    pub unsafe fn flush_reserved(&mut self, count: u32, mut f: impl FnMut(NonZeroU32)) {
         let mut advanced = self.current.advance(count, &mut f);
         if advanced < count {
             advanced += self.next.advance(count - advanced, &mut f);

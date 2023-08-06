@@ -4,7 +4,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use core::{
     fmt,
-    sync::atomic::{AtomicU64, Ordering},
+    sync::atomic::{AtomicU32, Ordering},
 };
 
 use hashbrown::{hash_map::Entry, HashMap};
@@ -35,9 +35,9 @@ impl fmt::Debug for EntityData {
 }
 
 pub(crate) struct EntitySet {
-    map: HashMap<u64, EntityData>,
+    map: HashMap<u32, EntityData>,
     id_allocator: IdAllocator,
-    reserve_counter: AtomicU64,
+    reserve_counter: AtomicU32,
 }
 
 impl fmt::Debug for EntitySet {
@@ -53,7 +53,7 @@ impl EntitySet {
         EntitySet {
             map: HashMap::new(),
             id_allocator: IdAllocator::new(),
-            reserve_counter: AtomicU64::new(0),
+            reserve_counter: AtomicU32::new(0),
         }
     }
 
@@ -61,7 +61,7 @@ impl EntitySet {
         EntitySet {
             map: HashMap::new(),
             id_allocator: IdAllocator::with_range_allocator(id_allocator),
-            reserve_counter: AtomicU64::new(0),
+            reserve_counter: AtomicU32::new(0),
         }
     }
 

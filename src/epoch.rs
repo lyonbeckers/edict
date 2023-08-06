@@ -3,7 +3,7 @@
 use core::{
     cell::Cell,
     fmt::{self, Debug},
-    sync::atomic::{AtomicU64, Ordering},
+    sync::atomic::{AtomicU32, Ordering},
 };
 
 /// Monotonically incremented epoch counter.
@@ -12,14 +12,14 @@ use core::{
 /// If incremented every nanosecond the counter will overflow in 14'029 years.
 /// Vibes tell me no currently written software will run in 14'000 years, let alone 14'029.
 pub struct EpochCounter {
-    value: AtomicU64,
+    value: AtomicU32,
 }
 
 impl EpochCounter {
     /// Returns new epoch counter.
     pub const fn new() -> Self {
         EpochCounter {
-            value: AtomicU64::new(0),
+            value: AtomicU32::new(0),
         }
     }
 
@@ -41,7 +41,7 @@ impl EpochCounter {
     /// Bumps to the next epoch and returns new epoch id.
     pub fn next(&self) -> EpochId {
         let old = self.value.fetch_add(1, Ordering::Relaxed);
-        debug_assert!(old < u64::MAX);
+        debug_assert!(old < u32::MAX);
         EpochId { value: old + 1 }
     }
 
@@ -49,7 +49,7 @@ impl EpochCounter {
     /// But faster
     pub fn next_mut(&mut self) -> EpochId {
         let value = self.value.get_mut();
-        debug_assert!(*value < u64::MAX);
+        debug_assert!(*value < u32::MAX);
         *value += 1;
         EpochId { value: *value }
     }
@@ -59,7 +59,7 @@ impl EpochCounter {
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct EpochId {
-    value: u64,
+    value: u32,
 }
 
 impl Default for EpochId {
@@ -71,7 +71,7 @@ impl Default for EpochId {
 impl Debug for EpochId {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> core::fmt::Result {
-        <u64 as Debug>::fmt(&self.value, f)
+        <u32 as Debug>::fmt(&self.value, f)
     }
 }
 

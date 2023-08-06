@@ -69,7 +69,7 @@ use crate::{
 /// ```
 pub struct Scheduler {
     systems: Vec<ScheduledSystem>,
-    schedule_cache_id: Option<u64>,
+    schedule_cache_id: Option<u32>,
     action_buffers: Vec<ActionBuffer>,
 }
 

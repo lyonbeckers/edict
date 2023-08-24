@@ -15,7 +15,7 @@ phantom_newtype! {
 
 impl<T> QueryBorrowAll<&T>
 where
-    T: Sync + ?Sized + 'static,
+    T: ?Sized + 'static,
 {
     /// Creates a new [`QueryBorrowAll`] query.
     pub fn query() -> PhantomData<fn() -> Self> {
@@ -37,7 +37,7 @@ pub struct FetchBorrowAllRead<'a, T: ?Sized> {
 
 unsafe impl<'a, T> Fetch<'a> for FetchBorrowAllRead<'a, T>
 where
-    T: Sync + ?Sized + 'a,
+    T: ?Sized + 'a,
 {
     type Item = Vec<&'a T>;
 
@@ -65,7 +65,7 @@ where
 
 unsafe impl<T> PhantomQuery for QueryBorrowAll<&T>
 where
-    T: Sync + ?Sized + 'static,
+    T: ?Sized + 'static,
 {
     type Item<'a> = Vec<&'a T>;
     type Fetch<'a> = FetchBorrowAllRead<'a, T>;
@@ -122,4 +122,4 @@ where
     }
 }
 
-unsafe impl<T> ImmutablePhantomQuery for QueryBorrowAll<&T> where T: Sync + ?Sized + 'static {}
+unsafe impl<T> ImmutablePhantomQuery for QueryBorrowAll<&T> where T: ?Sized + 'static {}

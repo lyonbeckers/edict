@@ -44,6 +44,7 @@ where
 }
 
 /// Filters origins of relation with specified target.
+#[derive(Clone)]
 pub struct FilterRelatesTo<R> {
     target: EntityId,
     phantom: PhantomData<R>,

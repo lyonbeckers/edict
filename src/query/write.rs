@@ -15,7 +15,7 @@ pub struct FetchWrite<'a, T> {
 
 unsafe impl<'a, T> Fetch<'a> for FetchWrite<'a, T>
 where
-    T: Send + 'a,
+    T: 'a,
 {
     type Item = &'a mut T;
 
@@ -47,7 +47,7 @@ where
 
 unsafe impl<T> PhantomQuery for &mut T
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Item<'a> = &'a mut T;
     type Fetch<'a> = FetchWrite<'a, T>;
@@ -98,7 +98,6 @@ pub type Write<T> = PhantomData<fn() -> &'static mut T>;
 /// Skips entities that don't have the component.
 pub fn write<T>() -> Write<T>
 where
-    T: Send,
 {
     assert_query::<Write<T>>();
     PhantomData

@@ -13,7 +13,7 @@ pub struct FetchRead<'a, T> {
 
 unsafe impl<'a, T> Fetch<'a> for FetchRead<'a, T>
 where
-    T: Sync + 'a,
+    T: 'a,
 {
     type Item = &'a T;
 
@@ -33,7 +33,7 @@ where
 
 unsafe impl<T> PhantomQuery for &T
 where
-    T: Sync + 'static,
+    T: 'static,
 {
     type Item<'a> = &'a T;
     type Fetch<'a> = FetchRead<'a, T>;
@@ -71,7 +71,7 @@ where
     }
 }
 
-unsafe impl<T> ImmutablePhantomQuery for &T where T: Sync + 'static {}
+unsafe impl<T> ImmutablePhantomQuery for &T where T: 'static {}
 
 /// [`Query`] type for the `&T` phantom query.
 pub type Read<T> = PhantomData<fn() -> &'static T>;
@@ -82,7 +82,6 @@ pub type Read<T> = PhantomData<fn() -> &'static T>;
 /// Skips entities that don't have the component.
 pub fn read<T>() -> Read<T>
 where
-    T: Sync,
 {
     assert_immutable_query::<Read<T>>();
 

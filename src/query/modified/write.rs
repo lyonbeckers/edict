@@ -22,7 +22,7 @@ pub struct ModifiedFetchWrite<'a, T> {
 
 unsafe impl<'a, T> Fetch<'a> for ModifiedFetchWrite<'a, T>
 where
-    T: Send + 'a,
+    T: 'a,
 {
     type Item = &'a mut T;
 
@@ -67,7 +67,7 @@ where
 
 impl<T> IntoQuery for Modified<&mut T>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Query = Self;
 
@@ -78,7 +78,7 @@ where
 
 unsafe impl<T> Query for Modified<&mut T>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Item<'a> = &'a mut T;
     type Fetch<'a> = ModifiedFetchWrite<'a, T>;
@@ -132,7 +132,7 @@ where
 
 impl<'a, T> QueryArgGet<'a> for ModifiedCache<&'static mut T>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Arg = Modified<&'a mut T>;
     type Query = Modified<&'a mut T>;
@@ -150,7 +150,7 @@ where
 
 impl<T> QueryArgCache for ModifiedCache<&'static mut T>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     fn new() -> Self {
         ModifiedCache {
@@ -170,14 +170,14 @@ where
 
 impl<'a, T> QueryArg for Modified<&'a mut T>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Cache = ModifiedCache<&'static mut T>;
 }
 
 impl<T> IntoQuery for Modified<Option<&mut T>>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Query = Self;
 
@@ -188,7 +188,7 @@ where
 
 unsafe impl<T> Query for Modified<Option<&mut T>>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Item<'a> = Option<&'a mut T>;
     type Fetch<'a> = Option<ModifiedFetchWrite<'a, T>>;
@@ -255,7 +255,7 @@ where
 
 impl<'a, T> QueryArgGet<'a> for ModifiedCache<Option<&'static mut T>>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Arg = Modified<Option<&'a mut T>>;
     type Query = Modified<Option<&'a mut T>>;
@@ -273,7 +273,7 @@ where
 
 impl<T> QueryArgCache for ModifiedCache<Option<&'static mut T>>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     fn new() -> Self {
         ModifiedCache {
@@ -293,7 +293,7 @@ where
 
 impl<'a, T> QueryArg for Modified<Option<&mut T>>
 where
-    T: Send + 'static,
+    T: 'static,
 {
     type Cache = ModifiedCache<Option<&'static mut T>>;
 }

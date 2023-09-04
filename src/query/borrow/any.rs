@@ -23,7 +23,7 @@ where
 
 impl<T> QueryBorrowAny<&mut T>
 where
-    T: Send + ?Sized + 'static,
+    T: ?Sized + 'static,
 {
     /// Creates a new [`QueryBorrowAny`] query.
     pub fn query() -> PhantomData<fn() -> Self> {
@@ -125,7 +125,7 @@ pub struct FetchBorrowAnyWrite<'a, T: ?Sized> {
 
 unsafe impl<'a, T> Fetch<'a> for FetchBorrowAnyWrite<'a, T>
 where
-    T: Send + ?Sized + 'static,
+    T: ?Sized + 'static,
 {
     type Item = &'a mut T;
 
@@ -161,7 +161,7 @@ where
 
 unsafe impl<T> PhantomQuery for QueryBorrowAny<&mut T>
 where
-    T: Send + ?Sized + 'static,
+    T: ?Sized + 'static,
 {
     type Item<'a> = &'a mut T;
     type Fetch<'a> = FetchBorrowAnyWrite<'a, T>;
